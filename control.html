@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>세대 간 인식과 협업 상황 판단에 관한 설문조사</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #dbe2ea;
+      --primary: #2f5d8a;
+      --primary-dark: #244a70;
+      --primary-light: #eaf2f9;
+      --danger: #b45353;
+      --success: #2f7a5d;
+      --shadow: 0 8px 30px rgba(31, 41, 55, 0.06);
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #eef3f8 0%, var(--bg) 180px);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .eyebrow {
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    h1, h2, h3 { font-family: "Noto Serif KR", Georgia, serif; line-height: 1.4; margin: 0; }
+    h1 { font-size: clamp(1.55rem, 3.8vw, 2.2rem); margin-bottom: 10px; }
+    .subtitle { color: var(--muted); font-size: 0.95rem; margin: 0; }
+    .progress-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(8px);
+    }
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #e5edf4;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), #5b84b1);
+      transition: width .35s ease;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .step { display: none; }
+    .step.active { display: block; }
+    .section-title {
+      font-size: 1.35rem;
+      margin-bottom: 8px;
+      color: #1f3d5a;
+    }
+    .section-desc {
+      color: var(--muted);
+      margin: 0 0 24px;
+      font-size: 0.96rem;
+    }
+    .info-box, .material-box, .scenario-box {
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin: 18px 0;
+    }
+    .info-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      color: #374151;
+    }
+    .material-box {
+      background: #fbfcfe;
+      border: 1px solid #cfdce8;
+    }
+    .material-box h4, .scenario-box h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: #244a70;
+      font-family: "Noto Sans KR", sans-serif;
+      font-weight: 700;
+    }
+    .material-box blockquote, .scenario-box blockquote {
+      margin: 0;
+      color: #374151;
+      font-size: 0.96rem;
+    }
+    .scenario-box {
+      background: #f9fbfd;
+      border: 1px solid #dbe5ee;
+      margin-top: 28px;
+    }
+    .question {
+      padding: 22px 0;
+      border-bottom: 1px solid #e8edf2;
+    }
+    .question:last-child { border-bottom: none; padding-bottom: 0; }
+    .q-title {
+      font-weight: 600;
+      margin-bottom: 14px;
+      font-size: 1rem;
+    }
+    .q-title .req { color: var(--danger); margin-left: 4px; }
+    .q-title .opt { color: var(--muted); font-weight: 500; font-size: 0.88rem; margin-left: 6px; }
+    .options { display: grid; gap: 10px; }
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 13px;
+      border: 1px solid #dfe7ef;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: .15s ease;
+      background: #fff;
+    }
+    .option:hover { border-color: #9bb6ce; background: #fbfdff; }
+    .option input { margin-top: 3px; accent-color: var(--primary); }
+    .option.selected { border-color: var(--primary); background: var(--primary-light); }
+    .likert {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    .likert .option {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+      padding: 12px 8px;
+      min-height: 104px;
+      justify-content: flex-start;
+    }
+    .likert .option input { margin: 0; }
+    .likert-num { font-weight: 700; color: var(--primary); font-size: 1rem; }
+    .likert-label { font-size: 0.8rem; color: #4b5563; line-height: 1.4; word-break: keep-all; }
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      padding: 12px 14px;
+      border: 1px solid #ccd8e3;
+      border-radius: 10px;
+      font: inherit;
+      color: var(--text);
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid #ccd8e3;
+      border-radius: 10px;
+      font: inherit;
+      color: var(--text);
+    }
+    textarea:focus, input[type="text"]:focus, .option:focus-within {
+      outline: 2px solid #c7daea;
+      outline-offset: 1px;
+      border-color: var(--primary);
+    }
+    .error {
+      display: none;
+      margin-top: 12px;
+      color: var(--danger);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .error.show { display: block; }
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #e8edf2;
+    }
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-secondary { background: #edf3f8; color: #294c6b; }
+    .btn-secondary:hover:not(:disabled) { background: #dfeaf3; }
+    .btn-outline {
+      background: #fff; color: var(--primary); border: 1px solid #b9cede;
+    }
+    .btn-outline:hover:not(:disabled) { background: #f4f9fd; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .complete-icon {
+      width: 64px; height: 64px; border-radius: 50%; background: #e8f3ee; color: var(--success);
+      display: grid; place-items: center; font-size: 2rem; margin-bottom: 16px;
+    }
+    .summary {
+      margin-top: 24px;
+      padding: 18px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .summary h4 { margin: 0 0 12px; font-size: 1rem; font-family: "Noto Sans KR", sans-serif; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      font-size: 0.92rem;
+    }
+    .summary-item { padding: 10px 12px; background: #fff; border-radius: 8px; border: 1px solid #e5edf3; }
+    .summary-item .k { color: var(--muted); font-size: 0.82rem; }
+    .summary-item .v { font-weight: 700; color: #244a70; margin-top: 2px; }
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(16px);
+      background: #1f2937; color: #fff; padding: 12px 16px; border-radius: 10px;
+      font-size: 0.92rem; opacity: 0; transition: .2s ease; z-index: 50; max-width: calc(100vw - 32px);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .footnote { color: var(--muted); font-size: 0.85rem; margin-top: 16px; }
+    .terminated { text-align: center; padding: 24px 0 8px; }
+    .terminated p { color: var(--muted); }
+    @media (max-width: 720px) {
+      .card { padding: 20px; }
+      .likert { grid-template-columns: 1fr; }
+      .likert .option { flex-direction: row; text-align: left; min-height: 0; align-items: flex-start; }
+      .likert-num { min-width: 24px; }
+      .nav { flex-direction: column-reverse; }
+      .btn { width: 100%; }
+      .actions .btn { width: auto; flex: 1; }
+    }
+    @media print { .progress-card, .nav, .actions { display: none !important; } .card { box-shadow: none; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <div class="eyebrow">SOCIAL PSYCHOLOGY SURVEY</div>
+      <h1>세대 간 인식과 협업 상황 판단에 관한 설문조사</h1>
+      <p class="subtitle">20대의 세대 인식과 협업 상황 판단 과정에 관한 익명 설문</p>
+    </header>
+
+    <div class="progress-card" id="progressCard">
+      <div class="progress-top">
+        <span id="progressText">시작 안내</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <main class="card">
+      <!-- Step 0 -->
+      <section class="step active" data-step="0">
+        <h2 class="section-title">설문 안내</h2>
+        <p class="section-desc">참여 전 아래 내용을 확인해 주세요.</p>
+        <div class="info-box">
+          안녕하세요. 사회심리학 팀프로젝트의 일환으로 20대의 세대 인식과 협업 상황 판단 과정을 알아보기 위한 설문입니다. 본 설문은 익명으로 처리되며, [기본 정보 → 사전 판단 → 중립적 자료 읽기 및 생각 정리 → 사후 판단 및 후기] 순으로 약 3~4분 내외로 진행됩니다. 정답이 없는 검사이므로 평소 본인의 생각과 가장 가까운 쪽을 솔직하게 응답해 주세요.
+        </div>
+        <div class="info-box" style="margin-top:0;">
+          <strong>응답 안내</strong><br>
+          모든 리커트 문항은 5점 척도로 응답합니다. (1: 전혀 그렇지 않다 ~ 5: 매우 그렇다)
+        </div>
+        <div class="nav">
+          <span></span>
+          <button class="btn btn-primary" id="startBtn">설문 시작하기</button>
+        </div>
+      </section>
+
+      <!-- Step 1 -->
+      <section class="step" data-step="1">
+        <h2 class="section-title">응답자 기본 정보</h2>
+        <p class="section-desc">아래 기본 정보를 선택해 주세요.</p>
+
+        <div class="question" data-required="true" data-name="Q1">
+          <div class="q-title">Q1. 귀하의 연령대를 확인해 주세요.<span class="req">*</span></div>
+          <div class="options" role="radiogroup" aria-label="연령대">
+            <label class="option"><input type="radio" name="Q1" value="20대"><span>20대</span></label>
+            <label class="option"><input type="radio" name="Q1" value="기타"><span>기타 (본 설문은 20대를 대상으로 진행됩니다)</span></label>
+          </div>
+          <div class="error">연령대를 선택해 주세요.</div>
+        </div>
+
+        <div class="question" data-required="true" data-name="Q2">
+          <div class="q-title">Q2. 귀하의 성별을 선택해 주세요.<span class="req">*</span></div>
+          <div class="options" role="radiogroup" aria-label="성별">
+            <label class="option"><input type="radio" name="Q2" value="남성"><span>남성</span></label>
+            <label class="option"><input type="radio" name="Q2" value="여성"><span>여성</span></label>
+          </div>
+          <div class="error">성별을 선택해 주세요.</div>
+        </div>
+
+        <div class="nav">
+          <button class="btn btn-secondary" data-prev>이전</button>
+          <button class="btn btn-primary" data-next>다음</button>
+        </div>
+      </section>
+
+      <!-- Step 1 Terminated -->
+      <section class="step" data-step="terminated">
+        <div class="terminated">
+          <h2 class="section-title">설문 종료</h2>
+          <p>본 연구는 20대 표본을 대상으로 진행되어 설문이 종료됩니다.</p>
+          <p>참여에 관심 가져 주셔서 감사합니다.</p>
+        </div>
+      </section>
+
+      <!-- Step 2 -->
+      <section class="step" data-step="2">
+        <h2 class="section-title">처치 전 측정</h2>
+        <p class="section-desc">다음 두 가지 상황을 읽고, 각 인물의 행동 원인과 귀하의 생각에 가장 가까운 번호를 선택해 주세요. (두 상황 모두 동일한 프로젝트 협업 맥락을 가정합니다.)</p>
+
+        <div class="scenario-box">
+          <h4>[상황 A: 20대 사례]</h4>
+          <blockquote>"공동 프로젝트 진행 중 효율을 높이기 위해 새로운 방식을 제안했으나, <strong>20대 참여자 A</strong>가 '지금까지 준비한 틀을 바꾸면 혼란스러우니 기존 방식대로 진행하자'며 제안을 거절해 의견 조율이 멈췄습니다."</blockquote>
+        </div>
+        <div id="preA"></div>
+
+        <div class="scenario-box">
+          <h4>[상황 B: 50대 사례]</h4>
+          <blockquote>"공동 프로젝트 진행 중 효율을 높이기 위해 새로운 방식을 제안했으나, <strong>50대 참여자 B</strong>가 '지금까지 진행해 온 틀을 바꾸면 혼란스러우니 기존 방식대로 진행하자'며 제안을 거절해 의견 조율이 멈췄습니다."</blockquote>
+        </div>
+        <div id="preB"></div>
+
+        <div class="nav">
+          <button class="btn btn-secondary" data-prev>이전</button>
+          <button class="btn btn-primary" data-next>다음</button>
+        </div>
+      </section>
+
+      <!-- Step 3 -->
+      <section class="step" data-step="3">
+        <h2 class="section-title">중립적 자료 읽기 및 생각 정리</h2>
+        <p class="section-desc">아래 내용은 팀 프로젝트나 공동 작업을 진행할 때 참고할 수 있는 일반적인 협업 안내문입니다. 내용을 읽고 아래 질문에 답해 주세요.</p>
+
+        <div class="material-box">
+          <h4>[협업 안내: 공동 작업 문서 및 일정 관리]</h4>
+          <blockquote>공동 과제나 팀 프로젝트를 진행할 때는 작업 시작 전에 역할과 일정을 정리하고, 문서 버전과 회의 기록을 체계적으로 공유하는 것이 중요합니다. 또한 마감 기한을 기준으로 중간 점검 일정을 정해 두면 작업 누락이나 소통 혼선을 줄이는 데 도움이 됩니다.</blockquote>
+        </div>
+
+        <div class="question" data-required="true" data-name="Mid_1">
+          <div class="q-title">Mid_1. 위 협업 안내 내용을 읽은 뒤, 본인의 평소 작업 습관과 가장 가까운 것은 무엇입니까?<span class="req">*</span></div>
+          <div class="options" role="radiogroup" aria-label="자료 확인">
+            <label class="option"><input type="radio" name="Mid_1" value="1. 문서 관리나 중간 점검이 작업 진행에 도움이 된다"><span>1. 문서 관리나 중간 점검이 작업 진행에 도움이 된다</span></label>
+            <label class="option"><input type="radio" name="Mid_1" value="2. 문서 정리보다 그때그때 편한 방식으로 유연하게 진행하는 편이다"><span>2. 문서 정리보다 그때그때 편한 방식으로 유연하게 진행하는 편이다</span></label>
+            <label class="option"><input type="radio" name="Mid_1" value="3. 잘 모르겠다 / 상황에 따라 다르다"><span>3. 잘 모르겠다 / 상황에 따라 다르다</span></label>
+          </div>
+          <div class="error">문항에 응답해 주세요.</div>
+        </div>
+
+        <div class="question" data-required="true" data-name="Mid_2">
+          <div class="q-title">Mid_2. 평소 팀 과제나 공동 작업을 할 때, 협업 과정에서 가장 중요하다고 생각하는 점 한 가지를 한 줄로 적어주세요.<span class="req">*</span></div>
+          <input type="text" id="Mid_2" name="Mid_2" maxlength="300" placeholder="한 줄로 적어주세요.">
+          <div class="error">한 줄 이상 입력해 주세요.</div>
+        </div>
+
+        <div class="question" data-required="false" data-name="Mid_3">
+          <div class="q-title">Mid_3. 최근 과제, 알바, 동아리 등 공동 작업에서 일정이나 소통과 관련해 기억에 남는 경험이 있다면 짧게 적어주세요.<span class="opt">(선택)</span></div>
+          <input type="text" id="Mid_3" name="Mid_3" maxlength="300" placeholder="없음">
+        </div>
+
+        <div class="nav">
+          <button class="btn btn-secondary" data-prev>이전</button>
+          <button class="btn btn-primary" data-next>다음</button>
+        </div>
+      </section>
+
+      <!-- Step 4 -->
+      <section class="step" data-step="4">
+        <h2 class="section-title">처치 후 측정</h2>
+        <p class="section-desc">다음 두 가지 상황을 읽고, 각 인물의 행동 원인과 귀하의 생각에 가장 가까운 번호를 선택해 주세요.</p>
+
+        <div class="scenario-box">
+          <h4>[상황 C: 20대 사후 사례]</h4>
+          <blockquote>"공동 발표 자료를 취합하는 과정에서, <strong>20대 참여자 C</strong>가 전체 수정이 필요한 새로운 구성안 대신 '기존에 작성해 둔 초안대로 진행하는 것이 안전하다'며 수정을 보류해 논의가 중단되었습니다."</blockquote>
+        </div>
+        <div id="postC"></div>
+
+        <div class="scenario-box">
+          <h4>[상황 D: 50대 사후 사례]</h4>
+          <blockquote>"공동 발표 자료를 취합하는 과정에서, <strong>50대 참여자 D</strong>가 전체 수정이 필요한 새로운 구성안 대신 '기존에 작성해 둔 초안대로 진행하는 것이 안전하다'며 수정을 보류해 논의가 중단되었습니다."</blockquote>
+        </div>
+        <div id="postD"></div>
+
+        <div class="nav">
+          <button class="btn btn-secondary" data-prev>이전</button>
+          <button class="btn btn-primary" data-next>응답 완료</button>
+        </div>
+      </section>
+
+      <!-- Step 5 -->
+      <section class="step" data-step="5">
+        <div class="complete-icon" aria-hidden="true">✓</div>
+        <h2 class="section-title">설문이 완료되었습니다</h2>
+        <p class="section-desc">응답해 주셔서 감사합니다. 마지막으로 한 줄 후기를 남겨 주시면 데이터 내보내기가 활성화됩니다.</p>
+
+        <div class="question" data-required="true" data-name="Post_Review">
+          <div class="q-title">Post_Review. 본 설문에 참여하면서 상황 판단이나 협업 방식을 돌아본 소감을 한 줄로 적어주세요.<span class="req">*</span></div>
+          <input type="text" id="Post_Review" name="Post_Review" maxlength="500" placeholder="한 줄로 적어주세요.">
+          <div class="error">후기를 한 줄 입력하면 내보내기 버튼이 활성화됩니다.</div>
+        </div>
+
+        <div class="summary">
+          <h4>연구자용 데이터 내보내기</h4>
+          <p style="margin:0 0 14px; color:var(--muted); font-size:0.92rem;">현재 응답자의 원문항 응답, 정성 텍스트 응답, 파생 지표를 CSV로 다운로드하거나 클립보드에 복사할 수 있습니다.</p>
+          <div class="actions">
+            <button class="btn btn-primary" id="downloadCsvBtn" disabled>CSV 파일 다운로드</button>
+            <button class="btn btn-outline" id="copyCsvBtn" disabled>클립보드 복사</button>
+          </div>
+          <p class="footnote" id="exportHint" style="margin-top:10px;">Post_Review를 입력하면 내보내기 버튼이 활성화됩니다.</p>
+          <div class="summary-grid" id="derivedSummary" style="margin-top:16px;"></div>
+          <p class="footnote">파생 지표: Pre_관용도차이 = Pre_A3 - Pre_B3, Post_관용도차이 = Post_C3 - Post_D3, Pre_내적귀인차이 = Pre_B1 - Pre_A1, Post_내적귀인차이 = Post_D1 - Post_C1</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const LIKERT_LABELS = {
+      1: '전혀 그렇지 않다',
+      2: '그렇지 않은 편이다',
+      3: '보통이다',
+      4: '그런 편이다',
+      5: '매우 그렇다'
+    };
+
+    const likertQuestions = {
+      preA: [
+        { id: 'Pre_A1', text: 'A가 제안을 거절한 것은 본인의 고집스럽고 폐쇄적인 성격(또는 태도) 때문일 가능성이 크다.' },
+        { id: 'Pre_A2', text: 'A가 제안을 거절한 것은 일정 촉박이나 작업 안정성 유지 등 현실적인 상황 요인 때문일 가능성이 크다.' },
+        { id: 'Pre_A3', text: '나는 A의 입장과 방식을 이해하고 수긍할 수 있다.' }
+      ],
+      preB: [
+        { id: 'Pre_B1', text: 'B가 제안을 거절한 것은 본인의 고집스럽고 권위적인 성격(또는 태도) 때문일 가능성이 크다.' },
+        { id: 'Pre_B2', text: 'B가 제안을 거절한 것은 일정 촉박이나 작업 안정성 유지 등 현실적인 상황 요인 때문일 가능성이 크다.' },
+        { id: 'Pre_B3', text: '나는 B의 입장과 방식을 이해하고 수긍할 수 있다.' }
+      ],
+      postC: [
+        { id: 'Post_C1', text: 'C가 수정을 보류한 것은 본인의 융통성 부족이나 고집스러운 성향 때문일 가능성이 크다.' },
+        { id: 'Post_C2', text: 'C가 수정을 보류한 것은 촉박한 마감 시간이나 작업 완성도 유지 등 현실적 상황 요인 때문일 가능성이 크다.' },
+        { id: 'Post_C3', text: '나는 C의 입장과 방식을 이해하고 수긍할 수 있다.' }
+      ],
+      postD: [
+        { id: 'Post_D1', text: 'D가 수정을 보류한 것은 본인의 융통성 부족이나 권위적인 태도 때문일 가능성이 크다.' },
+        { id: 'Post_D2', text: 'D가 수정을 보류한 것은 촉박한 마감 시간이나 작업 완성도 유지 등 현실적 상황 요인 때문일 가능성이 크다.' },
+        { id: 'Post_D3', text: '나는 D의 입장과 방식을 이해하고 수긍할 수 있다.' }
+      ]
+    };
+
+    const stepOrder = [0, 1, 2, 3, 4, 5];
+    const stepLabels = {
+      0: '시작 안내',
+      1: '기본 정보',
+      2: '처치 전 측정',
+      3: '중립적 자료 읽기 및 생각 정리',
+      4: '사후 판단',
+      5: '사후 후기 및 내보내기'
+    };
+
+    const answers = {};
+    let currentStep = 0;
+
+    function renderLikertGroup(containerId, items) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = items.map(item => `
+        <div class="question" data-required="true" data-name="${item.id}">
+          <div class="q-title">${item.id}. ${item.text}<span class="req">*</span></div>
+          <div class="likert" role="radiogroup" aria-label="${item.id}">
+            ${[1,2,3,4,5].map(v => `
+              <label class="option">
+                <input type="radio" name="${item.id}" value="${v}">
+                <span class="likert-num">${v}</span>
+                <span class="likert-label">${LIKERT_LABELS[v]}</span>
+              </label>
+            `).join('')}
+          </div>
+          <div class="error">이 문항에 응답해 주세요.</div>
+        </div>
+      `).join('');
+    }
+
+    renderLikertGroup('preA', likertQuestions.preA);
+    renderLikertGroup('preB', likertQuestions.preB);
+    renderLikertGroup('postC', likertQuestions.postC);
+    renderLikertGroup('postD', likertQuestions.postD);
+
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+      const target = document.querySelector(`.step[data-step="${step}"]`);
+      if (target) target.classList.add('active');
+      currentStep = step;
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateProgress() {
+      const progressCard = document.getElementById('progressCard');
+      if (currentStep === 'terminated') {
+        progressCard.style.display = 'none';
+        return;
+      }
+      progressCard.style.display = '';
+      const idx = stepOrder.indexOf(currentStep);
+      const pct = Math.round((idx / (stepOrder.length - 1)) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressPct').textContent = pct + '%';
+      document.getElementById('progressText').textContent = `${idx + 1} / ${stepOrder.length} · ${stepLabels[currentStep]}`;
+    }
+
+    function collectStepAnswers(step) {
+      const section = document.querySelector(`.step[data-step="${step}"]`);
+      section.querySelectorAll('input[type="radio"]:checked').forEach(input => {
+        answers[input.name] = input.value;
+      });
+      section.querySelectorAll('input[type="text"], textarea').forEach(field => {
+        if (field.name) answers[field.name] = field.value.trim();
+      });
+    }
+
+    function validateStep(step) {
+      const section = document.querySelector(`.step[data-step="${step}"]`);
+      let valid = true;
+      section.querySelectorAll('.question[data-required="true"]').forEach(q => {
+        const name = q.dataset.name;
+        const textField = q.querySelector('input[type="text"], textarea');
+        const value = textField ? textField.value.trim() : '';
+        const checked = section.querySelector(`input[name="${name}"]:checked`);
+        const filled = textField ? value.length > 0 : !!checked;
+        const error = q.querySelector('.error');
+        if (!filled) {
+          valid = false;
+          if (error) error.classList.add('show');
+        } else {
+          if (error) error.classList.remove('show');
+        }
+      });
+      return valid;
+    }
+
+    function clearErrors(step) {
+      const section = document.querySelector(`.step[data-step="${step}"]`);
+      section.querySelectorAll('.error').forEach(e => e.classList.remove('show'));
+    }
+
+    function refreshExportState() {
+      const review = document.getElementById('Post_Review');
+      const ready = !!review && review.value.trim().length > 0;
+      document.getElementById('downloadCsvBtn').disabled = !ready;
+      document.getElementById('copyCsvBtn').disabled = !ready;
+      const hint = document.getElementById('exportHint');
+      if (hint) hint.textContent = ready ? '후기 입력이 확인되었습니다. 데이터를 내보낼 수 있습니다.' : 'Post_Review를 입력하면 내보내기 버튼이 활성화됩니다.';
+      if (ready) {
+        const err = review.closest('.question').querySelector('.error');
+        if (err) err.classList.remove('show');
+      }
+    }
+
+    function ensureFinalResponse() {
+      collectStepAnswers(5);
+      if (validateStep(5)) return true;
+      const err = document.querySelector('.step[data-step="5"] .error.show');
+      if (err) err.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      showToast('Post_Review를 한 줄 입력해 주세요.');
+      return false;
+    }
+
+    document.addEventListener('change', (e) => {
+      if (e.target.matches('input[type="radio"]')) {
+        const q = e.target.closest('.question');
+        if (q) {
+          q.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+          e.target.closest('.option').classList.add('selected');
+          const err = q.querySelector('.error');
+          if (err) err.classList.remove('show');
+        }
+      }
+    });
+
+    document.addEventListener('input', (e) => {
+      if (!e.target.matches('input[type="text"]')) return;
+      const q = e.target.closest('.question');
+      if (q && e.target.value.trim()) {
+        const err = q.querySelector('.error');
+        if (err) err.classList.remove('show');
+      }
+      if (e.target.id === 'Post_Review') refreshExportState();
+    });
+
+    document.getElementById('startBtn').addEventListener('click', () => showStep(1));
+
+    document.querySelectorAll('[data-next]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const step = currentStep;
+        clearErrors(step);
+        if (!validateStep(step)) {
+          const firstErr = document.querySelector(`.step[data-step="${step}"] .error.show`);
+          if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        collectStepAnswers(step);
+
+        if (step === 1 && answers.Q1 === '기타') {
+          showStep('terminated');
+          return;
+        }
+        if (step === 4) {
+          finalize();
+          showStep(5);
+          return;
+        }
+        const idx = stepOrder.indexOf(step);
+        showStep(stepOrder[idx + 1]);
+      });
+    });
+
+    document.querySelectorAll('[data-prev]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = stepOrder.indexOf(currentStep);
+        if (idx > 0) showStep(stepOrder[idx - 1]);
+      });
+    });
+
+    function num(v) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : '';
+    }
+
+    function getDerived() {
+      const Pre_A3 = num(answers.Pre_A3), Pre_B3 = num(answers.Pre_B3);
+      const Post_C3 = num(answers.Post_C3), Post_D3 = num(answers.Post_D3);
+      const Pre_B1 = num(answers.Pre_B1), Pre_A1 = num(answers.Pre_A1);
+      const Post_D1 = num(answers.Post_D1), Post_C1 = num(answers.Post_C1);
+      return {
+        'Pre_관용도차이': (Pre_A3 !== '' && Pre_B3 !== '') ? Pre_A3 - Pre_B3 : '',
+        'Post_관용도차이': (Post_C3 !== '' && Post_D3 !== '') ? Post_C3 - Post_D3 : '',
+        'Pre_내적귀인차이': (Pre_B1 !== '' && Pre_A1 !== '') ? Pre_B1 - Pre_A1 : '',
+        'Post_내적귀인차이': (Post_D1 !== '' && Post_C1 !== '') ? Post_D1 - Post_C1 : ''
+      };
+    }
+
+    function getExportRow() {
+      const derived = getDerived();
+      return {
+        Group: 'Control',
+        Q1: answers.Q1 || '',
+        Q2: answers.Q2 || '',
+        Pre_A1: answers.Pre_A1 || '',
+        Pre_A2: answers.Pre_A2 || '',
+        Pre_A3: answers.Pre_A3 || '',
+        Pre_B1: answers.Pre_B1 || '',
+        Pre_B2: answers.Pre_B2 || '',
+        Pre_B3: answers.Pre_B3 || '',
+        Mid_1: answers.Mid_1 || '',
+        Mid_2: answers.Mid_2 || '',
+        Mid_3: answers.Mid_3 || '',
+        Post_C1: answers.Post_C1 || '',
+        Post_C2: answers.Post_C2 || '',
+        Post_C3: answers.Post_C3 || '',
+        Post_D1: answers.Post_D1 || '',
+        Post_D2: answers.Post_D2 || '',
+        Post_D3: answers.Post_D3 || '',
+        Post_Review: answers.Post_Review || '',
+        ...derived
+      };
+    }
+
+    function csvEscape(value) {
+      const str = String(value ?? '');
+      if (/[",\n\r]/.test(str)) return '"' + str.replace(/"/g, '""') + '"';
+      return str;
+    }
+
+    function toCSV(row) {
+      const headers = Object.keys(row);
+      const lines = [headers.join(','), headers.map(h => csvEscape(row[h])).join(',')];
+      return '\uFEFF' + lines.join('\r\n');
+    }
+
+    function finalize() {
+      const derived = getDerived();
+      const summary = document.getElementById('derivedSummary');
+      const labels = {
+        'Pre_관용도차이': 'Pre_관용도차이 (Pre_A3-Pre_B3)',
+        'Post_관용도차이': 'Post_관용도차이 (Post_C3-Post_D3)',
+        'Pre_내적귀인차이': 'Pre_내적귀인차이 (Pre_B1-Pre_A1)',
+        'Post_내적귀인차이': 'Post_내적귀인차이 (Post_D1-Post_C1)'
+      };
+      summary.innerHTML = Object.entries(derived).map(([k, v]) => `
+        <div class="summary-item"><div class="k">${labels[k]}</div><div class="v">${v}</div></div>
+      `).join('');
+      refreshExportState();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    document.getElementById('downloadCsvBtn').addEventListener('click', () => {
+      if (!ensureFinalResponse()) return;
+      const row = getExportRow();
+      const csv = toCSV(row);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const ts = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const name = `survey_response_${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}_${pad(ts.getHours())}${pad(ts.getMinutes())}${pad(ts.getSeconds())}.csv`;
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('CSV 파일을 다운로드했습니다.');
+    });
+
+    document.getElementById('copyCsvBtn').addEventListener('click', async () => {
+      if (!ensureFinalResponse()) return;
+      const row = getExportRow();
+      const csv = toCSV(row);
+      try {
+        await navigator.clipboard.writeText(csv);
+        showToast('클립보드에 복사했습니다.');
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = csv;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('클립보드에 복사했습니다.');
+        } catch (_) {
+          showToast('복사에 실패했습니다. CSV 다운로드를 이용해 주세요.');
+        }
+        ta.remove();
+      }
+    });
+
+    updateProgress();
+  </script>
+</body>
+</html>
